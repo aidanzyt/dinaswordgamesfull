@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dina's Word Games</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f6f8ff 0%, #e9ecff 100%);
+            padding: 1rem;
+            padding-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .logo {
+            width: 220px;
+            height: auto;
+            margin-bottom: -50px;  /* Preserved your specific margin */
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.05);
+        }
+
+        .welcome {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #000000;
+            margin-bottom: 20px;
+            text-align: center;
+            background: linear-gradient(120deg, #000000 0%, #000000 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .popup-message {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 20px;
+    animation: fadeInOut 1.5s ease-in-out;
+    z-index: 1000;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+}
+
+@keyframes fadeInOut {
+    0% { opacity: 0; transform: translate(-50%, -40%); }
+    20% { opacity: 1; transform: translate(-50%, -50%); }
+    80% { opacity: 1; transform: translate(-50%, -50%); }
+    100% { opacity: 0; transform: translate(-50%, -60%); }
+}
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .game-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .game-card h2 {
+            font-size: 1.5rem;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            text-align: center;
+        }
+
+        .game-card p {
+            color: #4a5568;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .features-list {
+            background: #f7fafc;
+            border-radius: 0.5rem;
+            padding: 0.75rem;
+            margin-bottom: 1rem;
+            list-style: none;
+        }
+
+        .features-list li {
+            display: flex;
+            align-items: center;
+            color: #4a5568;
+            margin-bottom: 0.25rem;
+            font-size: 0.9rem;
+        }
+
+        .features-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        .features-list li span {
+            margin-right: 0.5rem;
+        }
+
+        .play-button {
+            display: block;
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .word-echo .play-button {
+            background-color: #0ce43b;
+            color: white;
+        }
+
+        .word-echo .play-button:hover {
+            background-color: #0fd440;
+        }
+
+        .dinas-game .play-button {
+            background-color: #00bfff;
+            color: white;
+        }
+
+        .dinas-game .play-button:hover {
+            background-color: #00a6ff;
+        }
+
+        /* Tips Section Styles */
+        .tips-container {
+            width: 100%;
+            max-width: 900px;
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+
+        .tip-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tip-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 1rem;
+        }
+
+        .tip-header h3 {
+            font-size: 1.2rem;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .tip-content {
+            position: relative;
+            height: 80px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tip {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+            color: #4a5568;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .tip.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tip-dots {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: auto;
+            padding-top: 1rem;
+        }
+
+        .theme-counter {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 14px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    z-index: 100;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.theme-button {
+    cursor: pointer;
+    padding: 5px;
+    transition: opacity 0.2s;
+}
+
+.theme-button:hover {
+    opacity: 0.7;
+}
+
+@media (max-width: 768px) {
+    .theme-counter {
+        top: auto;
+        bottom: 20px;
+    }
+}
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            transition: background-color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .dot.active {
+            background: #00bfff;
+        }
+
+        .word-echo-tips .dot.active {
+            background: #0ce43b;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 1rem;
+            color: #4a5568;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 0.5rem;
+            }
+
+            .logo {
+                width: 180px;
+            }
+
+            .welcome {
+                font-size: 1.75rem;
+            }
+
+            .games-grid, .tips-container {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="dinaswordgameslogo.svg" alt="Dina's Word Games" class="logo">
+        <h1 class="welcome">Welcome to Dina's Word Games!</h1>
+        <div class="theme-counter">
+            <span class="theme-button" onclick="cycleTheme()">🎨 Theme</span>
+        </div>
+        <div class="games-grid">
+            <!-- Word Echo Card -->
+            <div class="game-card word-echo">
+                <h2>Word Echo</h2>
+                <p>Find all possible synonyms for the daily word</p>
+                <ul class="features-list">
+                    <li><span>🎯</span> Daily challenge with new words</li>
+                    <li><span>🔄</span> Test your vocabulary knowledge</li>
+                    <li><span>🏆</span> Track your daily progress</li>
+                </ul>
+                <a href="word-echo.css" class="play-button">Play Word Echo</a>
+            </div>
+
+            <!-- Dina's Word Game Card -->
+            <div class="game-card dinas-game">
+                <h2>Dina's Word Game</h2>
+                <p>Create words using two given letters</p>
+                <ul class="features-list">
+                    <li><span>⏱️</span> 90-second time challenge</li>
+                    <li><span>🔤</span> Daily letter combinations</li>
+                    <li><span>🌟</span> Compete for high scores</li>
+                </ul>
+                <a href="dinas-word-game.html" class="play-button">Play Dina's Game</a>
+            </div>
+        </div>
+
+        <!-- Tips Section -->
+        <div class="tips-container">
+            <!-- Word Echo Tips -->
+            <div class="tip-card word-echo-tips">
+                <div class="tip-header">
+                    <span>💡</span>
+                    <h3>Word Echo Tips</h3>
+                </div>
+                <div class="tip-content">
+                    <div class="tip active">Start with common prefixes and suffixes - they often lead to multiple synonym variations!</div>
+                    <div class="tip">Think of context - words can have different meanings in different situations, expanding your options.</div>
+                    <div class="tip">Use categories - if you find one synonym, think of related words in the same category.</div>
+                </div>
+                <div class="tip-dots">
+                    <span class="dot active" onclick="switchTip(0, 'word-echo')"></span>
+                    <span class="dot" onclick="switchTip(1, 'word-echo')"></span>
+                    <span class="dot" onclick="switchTip(2, 'word-echo')"></span>
+                </div>
+            </div>
+
+            <!-- Dina's Game Tips -->
+            <div class="tip-card dinas-game-tips">
+                <div class="tip-header">
+                    <span>💡</span>
+                    <h3>Dina's Game Tips</h3>
+                </div>
+                <div class="tip-content">
+                    <div class="tip active">Try placing the required letters in different positions - start, middle, and end!</div>
+                    <div class="tip">Think of word families - if you find one word, similar words might also work.</div>
+                    <div class="tip">Use common letter combinations like 'th', 'ch', 'ing' to build longer words.</div>
+                </div>
+                <div class="tip-dots">
+                    <span class="dot active" onclick="switchTip(0, 'dinas-game')"></span>
+                    <span class="dot" onclick="switchTip(1, 'dinas-game')"></span>
+                    <span class="dot" onclick="switchTip(2, 'dinas-game')"></span>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Track your progress and compete with friends!</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentTips = {
+            'word-echo': 0,
+            'dinas-game': 0  // Changed from 'dinas' to 'dinas-game'
+        };
+    
+        function switchTip(index, game) {
+            // Updated selectors to match HTML class names
+            const container = document.querySelector(`.${game}-tips .tip-content`);
+            const dots = document.querySelectorAll(`.${game}-tips .dot`);
+            const tips = container.querySelectorAll('.tip');
+    
+            tips.forEach(tip => tip.classList.remove('active'));
+            dots.forEach(dot => dot.classList.remove('active'));
+    
+            tips[index].classList.add('active');
+            dots[index].classList.add('active');
+    
+            currentTips[game] = index;
+        }
+
+        const colorThemes = [
+    { name: '🏖️ Beach', background: 'linear-gradient(120deg, #fdeb93 0%, #f5b785 100%)' },
+    { name: '💼 PwC', background: 'linear-gradient(120deg, #ffffff 0%, #d35400 100%)' },
+    { name: '🇲🇪 Montenegro', background: 'linear-gradient(120deg, #cb3f3f 0%, #ffe900 100%)' },
+    { name: '🍂 Crunchy Leaves', background: 'linear-gradient(120deg, #ffcc80 0%, #d84315 100%)' },
+    { name: '🥛 Doogh', background: 'linear-gradient(120deg, #e0f7fa 0%, #80deea 100%)' }
+];
+
+// Initialize theme system
+let currentTheme = parseInt(localStorage.getItem('preferredTheme')) || 0;
+
+// Apply the saved theme on page load
+document.addEventListener('DOMContentLoaded', function() {
+    applyTheme(currentTheme);
+});
+
+// Function to apply a specific theme
+function applyTheme(themeIndex) {
+    const theme = colorThemes[themeIndex];
+    document.body.style.background = theme.background;
+}
+
+// Function to cycle to next theme
+function cycleTheme() {
+    currentTheme = (currentTheme + 1) % colorThemes.length;
+    const theme = colorThemes[currentTheme];
+    
+    // Apply the theme
+    applyTheme(currentTheme);
+    
+    // Show theme name message
+    showThemeMessage(theme.name);
+    
+    // Save preference
+    localStorage.setItem('preferredTheme', currentTheme);
+}
+
+// Theme change message display
+function showThemeMessage(message) {
+    // Remove any existing messages
+    const existingMessages = document.querySelectorAll('.theme-message');
+    existingMessages.forEach(msg => msg.remove());
+
+    const popup = document.createElement('div');
+    popup.className = 'popup-message';
+    popup.textContent = message;
+    document.body.appendChild(popup);
+    
+    // Remove popup after animation
+    setTimeout(() => {
+        if (popup && popup.parentNode) {
+            popup.parentNode.removeChild(popup);
+        }
+    }, 1500);
+}
+
+    
+        // Auto-rotate tips every 5 seconds
+        setInterval(() => {
+            Object.keys(currentTips).forEach(game => {
+                const nextTip = (currentTips[game] + 1) % 3;
+                switchTip(nextTip, game);
+            });
+        }, 5000);
+    </script>
+</body>
+</html>
